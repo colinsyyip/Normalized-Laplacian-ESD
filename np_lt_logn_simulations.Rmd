@@ -1,0 +1,84 @@
+---
+title: "np << logn Simulations"
+author: "Colin Yip, s3953629"
+date: "2024-09-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Setup
+Setting up constants/range of constants.
+```{r}
+n <- 1000
+p <- 9.21 * 10 ^ -3
+# p <- 0.5
+```
+
+### Simulate $A_n$
+```{r}
+A_n <- matrix(rbinom(n ^ 2, 1, p), nrow=n, ncol=n)
+A_n[lower.tri(A_n)] = t(A_n)[lower.tri(A_n)]
+diag(A_n) <- 0
+```
+
+### Calculate $D_n$, $\Delta_n$, $L_n$
+```{r}
+### D_n
+D_n <- matrix(0, nrow=n, ncol=n)
+diag(D_n) <- rowSums(A_n)
+
+### Delta_n
+delta_n <- D_n - A_n
+
+### Inv D_n
+inv_sqrt_D_n <- matrix(0, nrow=n, ncol=n)
+diag(inv_sqrt_D_n) <- diag(D_n ^ (-1/2))
+
+### L_n
+inv_sqrt_delta_n <- matrix(0, nrow=n, ncol=n)
+diag(inv_sqrt_delta_n) <- diag(delta_n ^ (-1/2))
+
+I_n <- matrix(0, nrow=n, ncol=n)
+diag(I_n) <- 1
+
+L_n <- I_n - inv_sqrt_delta_n %*% A_n %*% inv_sqrt_delta_n
+```
+
+### Calculate normalized $\lambda_i(A_n)$, $\lambda_i(\Delta_n)$, $\lambda_i(L_n)$
+```{r}
+### Normalized spectra of A_n
+centered_An <- A_n - p
+normed_centered_An <- centered_An * 1/sqrt(n * p * (1 - p))
+An_normed_spectra <- eigen(normed_centered_An, only.values = T)
+
+hist(An_normed_spectra$values, main=paste("ESD of Normalized A_n, n=", n, "p=", p),
+     breaks=25)
+
+### Normalized spectra of Delta_n (spectra is too tight by an order of magnitude. unclear if it is exhibiting the convolution)
+x_range <- seq(-5, 5, 0.1)
+#centering_delta_matrix <- matrix(-p, ncol=n, nrow=n)
+#diag(centering_delta_matrix) <- (n - 2) * p
+#centered_delta_n <- (delta_n - centering_delta_matrix)
+centered_delta_n <- (inv_sqrt_D_n %*% (A_n - p) %*% inv_sqrt_D_n)/sqrt(n * p)
+delta_n_spectra <- eigen(centered_delta_n, only.values = T)$values
+normed_centered_delta_n_spectra <- (delta_n_spectra)
+Fn_delta_n <- diff(sapply(x_range, \(x) mean(normed_centered_delta_n_spectra <= x)))
+
+hist(normed_centered_delta_n_spectra,
+     breaks=25,
+     main=paste("ESD of Normalized Delta_n, n=", n, "p=", p))
+
+### Normalized spectra of L_n
+L_n_spectra <- eigen(L_n, only.values = T)$values
+normed_centered_Ln_spectra <- (1 - L_n_spectra) * sqrt((n * p)/(1 - p))
+Fn_L_n <- diff(sapply(x_range, \(x) mean(normed_centered_Ln_spectra <= x)))
+
+hist(normed_centered_Ln_spectra, 
+     breaks=25,
+     main=paste("ESD of Normalized L_n, n=", n, "p=", p))
+```
+
+
