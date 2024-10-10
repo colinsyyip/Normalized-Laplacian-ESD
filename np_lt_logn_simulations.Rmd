@@ -12,9 +12,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ### Setup
 Setting up constants/range of constants.
 ```{r}
-n <- 1000
+n <- 10000
 p <- 9.21 * 10 ^ -3
-# p <- 0.5
 ```
 
 ### Simulate $A_n$
@@ -53,32 +52,49 @@ L_n <- I_n - inv_sqrt_delta_n %*% A_n %*% inv_sqrt_delta_n
 centered_An <- A_n - p
 normed_centered_An <- centered_An * 1/sqrt(n * p * (1 - p))
 An_normed_spectra <- eigen(normed_centered_An, only.values = T)
+L_n_normalized_An <- inv_sqrt_D_n %*% (A_n) %*% inv_sqrt_D_n
+L_n_centering <- matrix(0 - 1/(n-1), ncol=n, nrow=n)
+diag(L_n_centering) <- 1 - 0
 
 hist(An_normed_spectra$values, main=paste("ESD of Normalized A_n, n=", n, "p=", p),
      breaks=25)
 
-### Normalized spectra of Delta_n (spectra is too tight by an order of magnitude. unclear if it is exhibiting the convolution)
+### Normalized and centered/uncentered spectra of Delta_n 
 x_range <- seq(-5, 5, 0.1)
-#centering_delta_matrix <- matrix(-p, ncol=n, nrow=n)
-#diag(centering_delta_matrix) <- (n - 2) * p
-#centered_delta_n <- (delta_n - centering_delta_matrix)
-centered_delta_n <- (inv_sqrt_D_n %*% (A_n - p) %*% inv_sqrt_D_n)/sqrt(n * p)
-delta_n_spectra <- eigen(centered_delta_n, only.values = T)$values
-normed_centered_delta_n_spectra <- (delta_n_spectra)
+centering_delta_matrix <- matrix(-p, ncol=n, nrow=n)
+diag(centering_delta_matrix) <- (n - 2) * p
+centered_delta_n <- (delta_n - centering_delta_matrix)/sqrt(n * p)
+normed_centered_delta_n_spectra <- eigen(centered_delta_n, only.values = T)$values
+normed_delta_n_spectra <- eigen(delta_n, only.values=T)$values/sqrt(n * p)
 Fn_delta_n <- diff(sapply(x_range, \(x) mean(normed_centered_delta_n_spectra <= x)))
 
 hist(normed_centered_delta_n_spectra,
      breaks=25,
-     main=paste("ESD of Normalized Delta_n, n=", n, "p=", p))
+     main=paste("ESD of Normalized/Centered Delta_n, n=", n, "p=", p))
 
-### Normalized spectra of L_n
-L_n_spectra <- eigen(L_n, only.values = T)$values
-normed_centered_Ln_spectra <- (1 - L_n_spectra) * sqrt((n * p)/(1 - p))
-Fn_L_n <- diff(sapply(x_range, \(x) mean(normed_centered_Ln_spectra <= x)))
+hist(normed_delta_n_spectra,
+     breaks=25,
+     main=paste("ESD of Normalized/Uncentered Delta_n, n=", n, "p=", p))
+
+### Normalized/centered spectra of L_n
+centered_L_n <- L_n - L_n_centering
+normed_centered_Ln_spectra <- eigen(centered_L_n * sqrt((n * p)/(1 - p)), 
+                                     only.values = T)$values
+Fn_L_n_cent <- diff(sapply(x_range, \(x) mean(normed_centered_Ln_spectra <= x)))
 
 hist(normed_centered_Ln_spectra, 
      breaks=25,
-     main=paste("ESD of Normalized L_n, n=", n, "p=", p))
+     main=paste("ESD of Normalized/Centered L_n, n=", n, "p=", p))
+
+
+### Only normalized
+L_n_spectra <- eigen(L_n, only.values = T)$values
+normed_Ln_spectra <- (L_n_spectra) * sqrt((n * p)/(1 - p))
+Fn_L_n_norm <- diff(sapply(x_range, \(x) mean(normed_centered_Ln_spectra <= x)))
+
+hist(normed_Ln_spectra, 
+     breaks=25,
+     main=paste("ESD of Normalized/Uncentered L_n, n=", n, "p=", p))
 ```
 
 
