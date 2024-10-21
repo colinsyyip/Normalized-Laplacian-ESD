@@ -3,8 +3,8 @@ using LinearAlgebra
 using Plots
 
 # Params
-n = 25000
-p = 1.11 * 10 ^ -4
+n = 10000
+p = 9.21 * 10 ^ -3
 
 # Matrix setup
 A_n_raw = rand(Distributions.Bernoulli(p), n, n)
