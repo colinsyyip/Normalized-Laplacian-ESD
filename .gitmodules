@@ -1,0 +1,3 @@
+[submodule "GNN_Corrections/sdnext"]
+	path = GNN_Corrections/sdnext
+	url = https://github.com/vladmandic/sdnext.git

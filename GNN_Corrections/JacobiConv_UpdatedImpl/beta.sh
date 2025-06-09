@@ -1,0 +1,10 @@
+/usr/bin/python RealWorld_beta.py --dataset citeseer --device 2
+/usr/bin/python RealWorld_beta.py --dataset chameleon  --device 2
+/usr/bin/python RealWorld_beta.py --dataset squirrel --device 2
+/usr/bin/python RealWorld_beta.py --dataset cornell --device 2
+/usr/bin/python RealWorld_beta.py --dataset texas --device 2
+/usr/bin/python RealWorld_beta.py --dataset film --device 2
+/usr/bin/python RealWorld_beta.py --dataset photo --device 2
+/usr/bin/python RealWorld_beta.py --dataset pubmed --device 2
+/usr/bin/python RealWorld_beta.py --dataset cora --device 2
+/usr/bin/python RealWorld_beta.py --dataset computers --device 2
