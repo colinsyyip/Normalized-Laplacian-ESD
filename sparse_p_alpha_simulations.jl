@@ -1,13 +1,17 @@
-# Simulating for manually setting np <= logn
+# Simulating for fixed alphas, st np = alpha, and exp(-alpha) > 0, of course. Drop all eigenvalues that are near 0 (lambda < 0.0005)
+# NO NEAR 0 REMOVAL
+# alpha < 1
 
 using LinearAlgebra
 using Plots
 using LaTeXStrings
 include("support_functions.jl")
 
+# Params
 n = 10000
-p = 9.21 * 10 ^ -4
-figure_path = "sparse_p_npltlogn_figures/"
+alpha = 0.5
+p = alpha / n
+figure_path = "sparse_alpha_lt1_figures/"
 
 # Matrix setup
 matrices = matrix_generator(n, p)
